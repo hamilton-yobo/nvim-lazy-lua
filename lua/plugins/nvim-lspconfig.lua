@@ -2,7 +2,14 @@ local on_attach = require("util.lsp").on_attach
 
 local config = function()
 	require("neoconf").setup({})
-	local cmp_nvim_lsp = require("cmp_nvim_lsp")
+
+	-- local cmp_nvim_lsp = require("cmp_nvim_lsp")
+	require("cmp").setup({
+		sources = {
+			{ name = "nvim_lsp" },
+		},
+	})
+	local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 	local lspconfig = require("lspconfig")
 	-- Define custom signs
@@ -13,7 +20,7 @@ local config = function()
 		vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 	end
 
-	local capabilities = cmp_nvim_lsp.defautl_capabilities()
+	-- local capabilities = cmp_nvim_lsp.defautl_capabilities()
 
 	-- lua
 	lspconfig.lua_ls.setup({
@@ -52,16 +59,31 @@ local config = function()
 		},
 	})
 
+	lspconfig.ts_ls.setup({
+		capabilities = capabilities,
+		on_attach = on_attach,
+	})
+
+  lspconfig.cssls.setup({
+    capabilities = capabilities,
+    on_attach = on_attach,
+  })
+
 	local luacheck = require("efmls-configs.linters.luacheck")
 	local stylua = require("efmls-configs.formatters.stylua")
 	local flake8 = require("efmls-configs.linters.flake8")
 	local black = require("efmls-configs.formatters.black")
+	local eslint_d = require("efmls-configs.linters.eslint_d")
+	local prettierd = require("efmls-configs.formatters.prettier_d")
+  local stylelint = require("efmls-configs.linters.stylelint")
 
 	-- configure efm server
 	lspconfig.efm.setup({
 		filetypes = {
 			"lua",
 			"python",
+			"typescript",
+      "stylesheet"
 		},
 		init_options = {
 			documentFormatting = true,
@@ -75,6 +97,8 @@ local config = function()
 			languages = {
 				lua = { luacheck, stylua },
 				python = { flake8, black },
+				typescript = { eslint_d, prettierd },
+        stylesheet = { stylelint }
 			},
 		},
 	})
@@ -101,5 +125,6 @@ return {
 		"windwp/nvim-autopairs",
 		"williamboman/mason.nvim",
 		"creativenull/efmls-configs-nvim",
+		"hrsh7th/cmp-nvim-lsp",
 	},
 }
