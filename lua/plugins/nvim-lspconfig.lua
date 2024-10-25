@@ -58,13 +58,23 @@ local config = function()
 			},
 		},
 	})
-
+	-- typescript/javascript
 	lspconfig.ts_ls.setup({
 		capabilities = capabilities,
 		on_attach = on_attach,
 	})
-
-  lspconfig.cssls.setup({
+	-- stylesheets
+	lspconfig.cssls.setup({
+		capabilities = capabilities,
+		on_attach = on_attach,
+	})
+	-- html
+	lspconfig.html.setup({
+		capabilities = capabilities,
+		on_attach = on_attach,
+	})
+  -- tailwindcss
+  lspconfig.tailwindcss.setup({
     capabilities = capabilities,
     on_attach = on_attach,
   })
@@ -75,7 +85,7 @@ local config = function()
 	local black = require("efmls-configs.formatters.black")
 	local eslint_d = require("efmls-configs.linters.eslint_d")
 	local prettierd = require("efmls-configs.formatters.prettier_d")
-  local stylelint = require("efmls-configs.linters.stylelint")
+	local stylelint = require("efmls-configs.linters.stylelint")
 
 	-- configure efm server
 	lspconfig.efm.setup({
@@ -83,7 +93,8 @@ local config = function()
 			"lua",
 			"python",
 			"typescript",
-      "stylesheet"
+			"stylesheet",
+			"html",
 		},
 		init_options = {
 			documentFormatting = true,
@@ -98,7 +109,8 @@ local config = function()
 				lua = { luacheck, stylua },
 				python = { flake8, black },
 				typescript = { eslint_d, prettierd },
-        stylesheet = { stylelint }
+				stylesheet = { stylelint },
+				html = { prettierd },
 			},
 		},
 	})
@@ -108,7 +120,7 @@ local config = function()
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = lsp_fmt_group,
 		callback = function()
-			local efm = vim.lsp.get_active_clients({ name = "efm" })
+			local efm = vim.lsp.get_clients({ name = "efm" })
 			if vim.tbl_isempty(efm) then
 				return
 			end
